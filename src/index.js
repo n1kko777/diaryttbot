@@ -44,7 +44,7 @@ bot.hears("Добавить матч", (ctx) => {
 
 bot.action(/edit_(\d+)/, (ctx) => {
   const diaryId = parseInt(ctx.match[1]);
-  ctx.scene.enter("edit-match", { diaryId });
+  ctx.scene.enter("edit-match", { diaryId, prisma });
 });
 
 // Команда просмотра дневника

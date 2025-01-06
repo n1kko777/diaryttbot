@@ -56,7 +56,7 @@ const addMatchScene = new Scenes.WizardScene(
     const scores = ctx.message.text.split(",").map((s) => s.trim());
     ctx.wizard.state.scores = scores;
     ctx.reply(
-      'Добавьте комментарий (по желанию) или нажмите "Отмена" для выхода:',
+      'Добавьте комментарий или нажмите "Отмена" для выхода:',
       Markup.keyboard([["Отмена"]]).resize()
     );
     return ctx.wizard.next();

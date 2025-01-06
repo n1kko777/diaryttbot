@@ -47,6 +47,7 @@ const editMatchScene = new Scenes.WizardScene(
   },
   async (ctx) => {
     if (handleCancel(ctx)) return;
+    const prisma = ctx.scene.state.prisma;
 
     const diaryId = ctx.wizard.state.diaryId;
     const choice = ctx.wizard.state.choice;
