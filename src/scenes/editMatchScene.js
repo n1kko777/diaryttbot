@@ -46,39 +46,47 @@ const editMatchScene = new Scenes.WizardScene(
     return ctx.wizard.next();
   },
   async (ctx) => {
-    if (handleCancel(ctx)) return;
-    const prisma = ctx.scene.state.prisma;
+    try {
+      if (handleCancel(ctx)) return;
+      const prisma = ctx.scene.state.prisma;
 
-    const diaryId = ctx.wizard.state.diaryId;
-    const choice = ctx.wizard.state.choice;
-    const newValue = ctx.message.text;
+      const diaryId = ctx.wizard.state.diaryId;
+      const choice = ctx.wizard.state.choice;
+      const newValue = ctx.message.text;
 
-    const fields = {
-      1: { opponentName: newValue },
-      2: { opponentRating: parseInt(newValue) || null },
-      3: { opponentStyle: newValue },
-      4: { tacticalPlan: newValue },
-      5: { games: newValue.split(",").map((s) => ({ score: s.trim() })) },
-      6: { comments: newValue },
-    };
+      const fields = {
+        1: { opponentName: newValue },
+        2: { opponentRating: parseInt(newValue) || null },
+        3: { opponentStyle: newValue },
+        4: { tacticalPlan: newValue },
+        5: { games: newValue.split(",").map((s) => ({ score: s.trim() })) },
+        6: { comments: newValue },
+      };
 
-    if (choice === 5) {
-      await prisma.game.deleteMany({ where: { diaryId } });
-      await prisma.game.createMany({
-        data: fields[5].games.map((game) => ({ score: game.score, diaryId })),
-      });
-    } else {
-      await prisma.diary.update({
-        where: { id: diaryId },
-        data: fields[choice],
-      });
+      if (choice === 5) {
+        await prisma.game.deleteMany({ where: { diaryId } });
+        await prisma.game.createMany({
+          data: fields[5].games.map((game) => ({ score: game.score, diaryId })),
+        });
+      } else {
+        await prisma.diary.update({
+          where: { id: diaryId },
+          data: fields[choice],
+        });
+      }
+
+      ctx.reply(
+        "Матч успешно отредактирован!",
+        Markup.keyboard([["Добавить матч"], ["Просмотреть дневник"]]).resize()
+      );
+      return ctx.scene.leave();
+    } catch (error) {
+      ctx.reply(
+        "Невозможно изменить запись, возможно она была удалена ранее",
+        Markup.keyboard([["Добавить матч"], ["Просмотреть дневник"]]).resize()
+      );
+      return ctx.scene.leave();
     }
-
-    ctx.reply(
-      "Матч успешно отредактирован!",
-      Markup.keyboard([["Добавить матч"], ["Просмотреть дневник"]]).resize()
-    );
-    return ctx.scene.leave();
   }
 );
 

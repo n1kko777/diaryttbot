@@ -11,6 +11,8 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 const prisma = new PrismaClient();
 const stage = new Scenes.Stage([addMatchScene, editMatchScene]);
 
+bot.use(Telegraf.log());
+
 bot.use(session());
 bot.use(stage.middleware());
 

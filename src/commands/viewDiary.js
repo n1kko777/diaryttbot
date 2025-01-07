@@ -64,26 +64,30 @@ const viewDiary = async (ctx, prisma, bot) => {
   });
 
   bot.action(/delete_(\d+)/, async (ctx) => {
-    const diaryId = parseInt(ctx.match[1]);
+    try {
+      const diaryId = parseInt(ctx.match[1]);
 
-    await prisma.game.deleteMany({
-      where: { diaryId },
-    });
+      await prisma.game.deleteMany({
+        where: { diaryId },
+      });
 
-    await prisma.diary.delete({
-      where: { id: diaryId },
-    });
+      await prisma.diary.delete({
+        where: { id: diaryId },
+      });
 
-    ctx.reply("Матч успешно удалён!");
-    await ctx.answerCbQuery();
+      ctx.reply("Матч успешно удалён!");
+      await ctx.answerCbQuery();
 
-    // Обновляем отображение после удаления
-    diaries.splice(currentIndex, 1);
-    if (diaries.length > 0) {
-      currentIndex = Math.min(currentIndex, diaries.length - 1);
-      await displayMatch(ctx, currentIndex);
-    } else {
-      ctx.reply("Ваш дневник теперь пуст.");
+      // Обновляем отображение после удаления
+      diaries.splice(currentIndex, 1);
+      if (diaries.length > 0) {
+        currentIndex = Math.min(currentIndex, diaries.length - 1);
+        await displayMatch(ctx, currentIndex);
+      } else {
+        ctx.reply("Ваш дневник теперь пуст.");
+      }
+    } catch (error) {
+      ctx.reply("Невозможно удалить запись, возможно она была удалена ранее");
     }
   });
 };
