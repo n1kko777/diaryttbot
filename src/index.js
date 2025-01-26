@@ -5,7 +5,7 @@ const { PrismaClient } = require("@prisma/client");
 const { addMatchScene } = require("./scenes/addMatchScene");
 const { editMatchScene } = require("./scenes/editMatchScene");
 
-const { viewDiary } = require("./commands/viewDiary");
+const { viewDiary, setFilter, resetFilter } = require("./commands/viewDiary");
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const prisma = new PrismaClient();
@@ -51,6 +51,9 @@ bot.action(/edit_(\d+)/, (ctx) => {
 
 // Команда просмотра дневника
 bot.hears("Просмотреть дневник", (ctx) => viewDiary(ctx, prisma, bot));
+bot.hears("Сбросить фильтр", resetFilter);
+
+bot.command(["search", "s"], (ctx) => setFilter(ctx, prisma, bot));
 
 // Запуск бота
 bot.launch().then(() => console.log("Бот запущен!"));
