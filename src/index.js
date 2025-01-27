@@ -1,15 +1,25 @@
 require("dotenv").config();
 const { Telegraf, session, Scenes, Markup } = require("telegraf");
 const { PrismaClient } = require("@prisma/client");
+const { Mistral } = require("@mistralai/mistralai");
+const safeReply = require("telegraf-safe-md-reply");
 
 const { addMatchScene } = require("./scenes/addMatchScene");
 const { editMatchScene } = require("./scenes/editMatchScene");
 
 const { viewDiary, setFilter, resetFilter } = require("./commands/viewDiary");
+const { analyzeGames } = require("./commands/analyze");
+
+const apiKey = process.env.MISTRAL_API_KEY;
+const model = process.env.MISTRAL_API_MODEL;
+
+const client = new Mistral({ apiKey: apiKey });
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 const prisma = new PrismaClient();
 const stage = new Scenes.Stage([addMatchScene, editMatchScene]);
+
+bot.use(safeReply());
 
 bot.use(Telegraf.log());
 
@@ -54,6 +64,11 @@ bot.hears("Просмотреть дневник", (ctx) => viewDiary(ctx, prism
 bot.hears("Сбросить фильтр", resetFilter);
 
 bot.command(["search", "s"], (ctx) => setFilter(ctx, prisma, bot));
+
+bot.command(
+  ["ai", "analyze", "scan"],
+  async (ctx) => await analyzeGames(ctx, prisma, client, model)
+);
 
 // Запуск бота
 bot.launch().then(() => console.log("Бот запущен!"));
