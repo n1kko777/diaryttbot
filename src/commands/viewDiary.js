@@ -162,11 +162,12 @@ const viewDiary = async (ctx, prisma, bot) => {
       diaries.splice(currentIndex, 1);
       if (diaries.length > 0) {
         currentIndex = Math.min(currentIndex, diaries.length - 1);
-        await displayMatch(ctx, currentIndex);
+        await displayMatches();
       } else {
         ctx.reply("Ваш дневник теперь пуст.");
       }
     } catch (error) {
+      console.error("Ошибка при удалении данных:", error);
       ctx.reply("Невозможно удалить запись, возможно она была удалена ранее");
     }
   });
